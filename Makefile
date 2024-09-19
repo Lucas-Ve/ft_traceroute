@@ -1,16 +1,16 @@
 # Nom de l'exécutable
-NAME = ft_ping
+NAME = ft_traceroute
 
 # Options du compilateur
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -I includes
 
 # Dossiers
-SRCDIR = src
+SRCDIR = srcs
 INCDIR = includes
 
 # Fichiers sources et objets
-SRCS = $(SRCDIR)/main.c
+SRCS = $(SRCDIR)/main.c $(SRCDIR)/parsing.c $(SRCDIR)/utils.c $(SRCDIR)/traceroute.c
 OBJS = $(SRCS:.c=.o)
 
 # Commande pour créer l'exécutable
@@ -33,13 +33,5 @@ fclean: clean
 
 # Recompiler tout depuis zéro
 re: fclean all
-
-# Commande pour tester avec l'option -v
-test-v:
-	./$(NAME) -v 127.0.0.1
-
-# Commande pour tester avec l'option -?
-test-help:
-	./$(NAME) -?
 
 .PHONY: all clean fclean re test-v test-help
