@@ -44,6 +44,7 @@ void parse_arguments(int argc, char *argv[], t_traceroute *tr);
 int resolve_hostname(const char *hostname, char *ip_buffer);
 int is_valid_ipv4(const char *ip);
 void print_help();
+void print_hop(t_hop *hops);
 
 double calculate_time_diff(struct timeval *start, struct timeval *end);
 

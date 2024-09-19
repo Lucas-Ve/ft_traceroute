@@ -47,3 +47,45 @@ void initialize_hop(t_hop *hop, int ttl, struct timeval *start, struct timeval *
         inet_ntop(AF_INET, &recv_addr->sin_addr, hop->ip_address, sizeof(hop->ip_address));
     }
 }
+
+void print_hop(t_hop *hops)
+{
+    int unique_ips = 0;
+    for (int i = 0; i < 3; i++)
+    {
+        if (hops[i].ip_address[0] != '\0')
+        {
+            int is_unique = 1;
+
+            // Vérifie si l'adresse IP a déjà été affichée
+            for (int j = 0; j < i; j++)
+            {
+                if (strcmp(hops[i].ip_address, hops[j].ip_address) == 0)
+                {
+                    is_unique = 0; // L'adresse IP n'est pas unique
+                    break;
+                }
+            }
+
+            // Affiche l'adresse IP unique avec le temps de réponse
+            if (is_unique)
+            {
+                if (unique_ips > 0)
+                    printf(" ");
+                printf("(%s) %.3f ms", hops[i].ip_address, hops[i].response_time_ms);
+                unique_ips++;
+            }
+            else
+            {
+                printf(" %.3f ms", hops[i].response_time_ms);
+            }
+        }
+        else
+        {
+            if (unique_ips > 0)
+                printf(" ");
+            printf("*");
+            unique_ips++;
+        }
+    }
+}

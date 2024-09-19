@@ -54,16 +54,14 @@ void perform_traceroute(t_traceroute *tr) {
     socklen_t addr_len = sizeof(recv_addr);
     struct timeval start, end;
     t_hop hops[3];  // Tableau pour stocker les informations des trois paquets
-    int unique_ips = 0;     // Compteur pour gérer l'affichage des IP uniques
     int destination_reached = 0;
 
     // Création et configuration des sockets
     create_sockets(tr);
-    set_socket_timeout(tr->socket_fd, 1);
+    set_socket_timeout(tr->socket_fd, 2);
 
     for (int ttl = 1; ttl <= tr->max_ttl && !destination_reached; ttl++) {
         printf("%d ", ttl);
-        unique_ips = 0; // Réinitialise le compteur d'adresses IP uniques
 
         // Envoi de trois paquets pour chaque TTL
         for (int i = 0; i < 3; i++) {
@@ -74,45 +72,20 @@ void perform_traceroute(t_traceroute *tr) {
             gettimeofday(&end, NULL);
 
             initialize_hop(&hops[i], ttl, &start, &end, &recv_addr, received);
+        }
 
-            if (received > 0 && recv_addr.sin_addr.s_addr == tr->dest_addr.sin_addr.s_addr) {
+        print_hop(hops);
+
+        for (int i = 0; i < 3; i++)
+        {
+            if (!strcmp(hops[i].ip_address, tr->ip_address))
+            {
                 destination_reached = 1;
                 break;
             }
         }
-
-        // Affichage des résultats pour ce TTL
-        for (int i = 0; i < 3; i++) {
-            if (hops[i].ip_address[0] != '\0') {
-                int is_unique = 1;
-
-                // Vérifie si l'adresse IP a déjà été affichée
-                for (int j = 0; j < i; j++) {
-                    if (strcmp(hops[i].ip_address, hops[j].ip_address) == 0) {
-                        is_unique = 0; // L'adresse IP n'est pas unique
-                        break;
-                    }
-                }
-
-                // Affiche l'adresse IP unique avec le temps de réponse
-                if (is_unique) {
-                    if (unique_ips > 0) printf(" ");
-                    printf("(%s) %.3f ms", hops[i].ip_address, hops[i].response_time_ms);
-                    unique_ips++;
-                }
-                else{
-                    printf(" %.3f ms",hops[i].response_time_ms);
-                }
-            } else {
-                if (unique_ips > 0) printf(" ");
-                printf("*");
-                unique_ips++;
-            }
-        }
-        printf("\n"); // Nouvelle ligne après les résultats pour chaque TTL
+        printf("\n");
     }
-
-    // Fermeture des sockets
     close(tr->socket_fd);
     close(tr->udp_socket);
 }
