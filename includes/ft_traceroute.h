@@ -12,12 +12,22 @@
 #include <netdb.h>
 #include <errno.h>
 #include <sys/time.h>
+#include <netinet/ip.h>     // Pour struct iphdr
+#include <netinet/ip_icmp.h> // Pour struct icmphdr
+
+#define TIME_EXCEEDED 1
+#define DESTINATION_REACHED 2
+#define DESTINATION_UNREACHABLE 3
+#define NO_REPLY 4
+#define UNKNOWN 5
+
 
 // Définition d'une structure pour stocker les informations d'un saut
 typedef struct s_hop {
     int ttl;                    // Time To Live pour ce saut
     char ip_address[INET_ADDRSTRLEN]; // Adresse IP en format texte
     double response_time_ms;    // Temps de réponse en millisecondes
+    int status;
 } t_hop;
 
 // Définition d'une structure pour le contexte général de traceroute
